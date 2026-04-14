@@ -43,7 +43,7 @@ const SANS   = Platform.OS === 'ios' ? 'System'         : 'sans-serif';
 
 /* ── Scroll hint ─────────────────────────────────────────────────── */
 const ScrollHint = ({ text, color = 'rgba(100,100,95,0.45)' }: { text?: string; color?: string }) => (
-  <View style={[sty.scrollHint, { pointerEvents: 'none' as any }]}>
+  <View style={[sty.scrollHint, { pointerEvents: 'none' as const }]}>
     {text ? (
       <Text style={{ fontSize: 10, color, letterSpacing: 2, textTransform: 'uppercase', fontFamily: SANS }}>
         {text}

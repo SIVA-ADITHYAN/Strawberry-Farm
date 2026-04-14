@@ -7,7 +7,7 @@ import ProcessScreen from './screens/ProcessScreen';
 import BerrySweetRootsScreen from './screens/BerrySweetRootsScreen';
 
 export type RootStackParamList = {
-  Home: { goToCard?: number } | undefined;
+  Home: undefined;
   Process: undefined;
   BerrySweetRoots: undefined;
 };

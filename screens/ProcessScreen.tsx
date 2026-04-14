@@ -14,6 +14,7 @@ import { useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { Asset } from 'expo-asset';
+import * as FileSystem from 'expo-file-system';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 
@@ -72,8 +73,76 @@ const BackBtn = ({ onPress }: { onPress: () => void }) => (
   </TouchableOpacity>
 );
 
+/* ── PDF.js HTML — renders a single page as canvas, no toolbar/scrollbar ── */
+const makePdfHtml = (page: number, src: string, isBase64: boolean) => `<!DOCTYPE html>
+<html><head>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:#fff}
+  canvas{display:block;width:100%!important;height:auto!important}
+</style>
+</head><body>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+var docSrc=${isBase64
+  ? `(function(){var r=atob('${src}'),b=new Uint8Array(r.length);for(var i=0;i<r.length;i++)b[i]=r.charCodeAt(i);return{data:b};})()`
+  : `'${src}'`};
+pdfjsLib.getDocument(docSrc).promise
+  .then(function(p){return p.getPage(${page});})
+  .then(function(pg){
+    var c=document.getElementById('c'),ctx=c.getContext('2d');
+    var vp=pg.getViewport({scale:window.devicePixelRatio||1});
+    var scale=(window.innerWidth/vp.width);
+    vp=pg.getViewport({scale:scale*(window.devicePixelRatio||1)});
+    c.width=vp.width;c.height=vp.height;
+    c.style.width=window.innerWidth+'px';
+    c.style.height=(vp.height/((window.devicePixelRatio)||1))+'px';
+    pg.render({canvasContext:ctx,viewport:vp});
+  });
+</script>
+</body></html>`;
+
+/* ── Web iframe PDF viewer using PDF.js via Blob URL ─────────────── */
+// srcdoc iframes have null origin and block fetch — Blob URL preserves origin
+const WebPdfFrame = ({ page, pdfUri }: { page: number; pdfUri: string }) => {
+  const ref = useRef<any>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const win = window as any;
+    const doc = win.document as Document;
+
+    // Ensure absolute URL so PDF.js can fetch it from inside the blob iframe
+    const absoluteUri = pdfUri.startsWith('http')
+      ? pdfUri
+      : `${win.location.origin}${pdfUri.startsWith('/') ? '' : '/'}${pdfUri}`;
+
+    const html = makePdfHtml(page, absoluteUri, false);
+    const blob = new win.Blob([html], { type: 'text/html' });
+    const blobUrl = win.URL.createObjectURL(blob);
+
+    const iframe = doc.createElement('iframe');
+    iframe.src = blobUrl;
+    iframe.style.cssText = 'width:100%;height:100%;border:none;display:block;';
+    el.appendChild(iframe);
+
+    return () => {
+      try { el.removeChild(iframe); } catch {}
+      try { win.URL.revokeObjectURL(blobUrl); } catch {}
+    };
+  }, [page, pdfUri]);
+  return <View ref={ref} style={{ flex: 1 }} />;
+};
+
 /* ── PDF card ────────────────────────────────────────────────────── */
-const PdfCard = ({ pageNumber, pdfUri }: { pageNumber: number; pdfUri: string | null }) => {
+const PdfCard = ({ pageNumber, pdfUri, pdfBase64 }: {
+  pageNumber: number;
+  pdfUri: string | null;
+  pdfBase64: string | null;
+}) => {
   if (!pdfUri) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 8 }}>
@@ -83,22 +152,29 @@ const PdfCard = ({ pageNumber, pdfUri }: { pageNumber: number; pdfUri: string | 
     );
   }
 
-  // iOS renders PDFs natively in WebView; on Android use a fallback HTML page
-  if (Platform.OS === 'ios') {
+  // Web: inject iframe with PDF.js srcdoc — no toolbar, no scrollbar
+  if (Platform.OS === 'web') {
+    return <WebPdfFrame page={pageNumber} pdfUri={pdfUri} />;
+  }
+
+  // iOS: WebView with PDF.js HTML using base64 data — single page, image-like
+  if (Platform.OS === 'ios' && pdfBase64) {
     return (
       <WebView
-        source={{ uri: `${pdfUri}#page=${pageNumber}` }}
-        style={{ flex: 1, borderRadius: 16 }}
+        source={{ html: makePdfHtml(pageNumber, pdfBase64, true) }}
+        style={{ flex: 1 }}
         scrollEnabled={false}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
+        originWhitelist={['*']}
       />
     );
   }
 
-  // Android/Web fallback: styled official summary card
+  // iOS loading base64 / Android: styled summary card
   return (
-    <View style={{ flex: 1, backgroundColor: '#FBFAFF', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+    <View style={{ flex: 1, backgroundColor: '#FBFAFF', justifyContent: 'center',
+      alignItems: 'center', padding: 24 }}>
       <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'white',
         justifyContent: 'center', alignItems: 'center', marginBottom: 20,
         shadowColor: B.primary, shadowOffset: { width: 0, height: 4 },
@@ -116,19 +192,15 @@ const PdfCard = ({ pageNumber, pdfUri }: { pageNumber: number; pdfUri: string | 
       <View style={{ width: 40, height: 2, backgroundColor: B.border, marginBottom: 16 }} />
       <Text style={{ fontSize: 13, color: B.muted, textAlign: 'center', lineHeight: 22,
         fontFamily: SERIF, maxWidth: 220 }}>
-        Report No: FSRL2026-62{'\n'}
-        Analysed 08–11 Apr 2026{'\n'}
-        ICAR-IIHR Accredited
+        Report No: FL 23/026{'\n'}Issued 21 Jun 2023{'\n'}ICAR-IIHR Accredited
       </Text>
-
       <TouchableOpacity
-        onPress={() => pdfUri && Linking.openURL(pdfUri)}
+        onPress={() => Linking.openURL(pdfUri)}
         style={{ marginTop: 24, paddingVertical: 10, paddingHorizontal: 20,
-          backgroundColor: 'white', borderWidth: 1, borderColor: B.border, borderRadius: 12 }}
+          backgroundColor: 'white', borderWidth: 1.5, borderColor: B.border, borderRadius: 12 }}
       >
-        <Text style={{ fontSize: 11, color: B.primary, fontWeight: '700', fontFamily: SANS }}>
-          VIEW FULL PDF
-        </Text>
+        <Text style={{ fontSize: 11, color: B.primary, fontWeight: '700', fontFamily: SANS,
+          letterSpacing: 1.5, textTransform: 'uppercase' }}>Open PDF</Text>
       </TouchableOpacity>
     </View>
   );
@@ -145,13 +217,20 @@ export default function ProcessScreen({ navigation }: Props) {
   const [activeCard, setActiveCard] = useState(0);
   const isAnimating = useRef(false);
   const [pdfUri, setPdfUri] = useState<string | null>(null);
+  const [pdfBase64, setPdfBase64] = useState<string | null>(null);
 
   const colW = Math.min(SCREEN_W, 480);
 
   /* Load PDF asset */
   useEffect(() => {
     Asset.loadAsync(require('../assets/lab-report.pdf')).then(([asset]) => {
-      setPdfUri(asset.localUri ?? null);
+      const uri = asset.localUri ?? asset.uri ?? null;
+      setPdfUri(uri);
+      if (uri && Platform.OS === 'ios') {
+        FileSystem.readAsStringAsync(uri, { encoding: 'base64' as any })
+          .then(setPdfBase64)
+          .catch(() => {});
+      }
     }).catch(() => {});
   }, []);
 
@@ -244,10 +323,10 @@ export default function ProcessScreen({ navigation }: Props) {
                 marginBottom: 4, fontFamily: SERIF }}>Lab Report</Text>
               <Text style={{ fontSize: 11, color: '#555550', fontWeight: '600',
                 marginBottom: 2, fontFamily: SANS }}>
-                Report No: FSRL2026-62 · 13 Apr 2026
+                Report No: FL 23/026 · 21 Jun 2023
               </Text>
               <Text style={{ fontSize: 11, color: B.muted, marginBottom: 20, fontFamily: SANS }}>
-                Sample: Strawberry (1 kg) · Analysed 08–11 Apr 2026
+                Sample: Strawberry · ICAR-IIHR Accredited Lab
               </Text>
 
               <View style={{ flex: 1, justifyContent: 'center', gap: 10 }}>
@@ -279,7 +358,7 @@ export default function ProcessScreen({ navigation }: Props) {
                   <Text style={{ fontSize: 11, color: B.primary, fontWeight: '700',
                     fontFamily: SANS }}>Food Safety Referral Laboratory</Text>
                   <Text style={{ fontSize: 10, color: B.muted, fontFamily: SANS }}>
-                    ICAR-IIHR, Bangalore · TC-16406 Accredited
+                    ICAR-IIHR, Bangalore · FL 23/026 Accredited
                   </Text>
                 </View>
               </View>
@@ -305,7 +384,7 @@ export default function ProcessScreen({ navigation }: Props) {
                       Page 1 of 2
                     </Text>
                     <Text style={{ fontSize: 10, color: B.muted, fontFamily: SANS }}>
-                      FSRL2026-40
+                      FL 23/026
                     </Text>
                   </View>
                 </View>
@@ -315,12 +394,12 @@ export default function ProcessScreen({ navigation }: Props) {
                 borderRadius: 16, overflow: 'hidden',
                 shadowColor: B.primary, shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.14, shadowRadius: 10, elevation: 4 }}>
-                <PdfCard pageNumber={1} pdfUri={pdfUri} />
+                <PdfCard pageNumber={1} pdfUri={pdfUri} pdfBase64={pdfBase64} />
               </View>
 
               <Text style={{ marginTop: 8, textAlign: 'center', fontSize: 10,
                 color: B.muted, opacity: 0.6, fontFamily: SANS }}>
-                TC-16406 Accredited · Analysed 08–11 Apr 2026
+                FL 23/026 Accredited · Report issued 21 Jun 2023
               </Text>
             </View>
 
@@ -345,7 +424,7 @@ export default function ProcessScreen({ navigation }: Props) {
                       Page 2 of 2
                     </Text>
                     <Text style={{ fontSize: 10, color: B.muted, fontFamily: SANS }}>
-                      FSRL2026-40
+                      FL 23/026
                     </Text>
                   </View>
                 </View>
@@ -355,12 +434,12 @@ export default function ProcessScreen({ navigation }: Props) {
                 borderColor: 'rgba(193,140,93,0.22)', borderRadius: 16, overflow: 'hidden',
                 shadowColor: B.amber, shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.12, shadowRadius: 10, elevation: 4 }}>
-                <PdfCard pageNumber={2} pdfUri={pdfUri} />
+                <PdfCard pageNumber={2} pdfUri={pdfUri} pdfBase64={pdfBase64} />
               </View>
 
               <Text style={{ marginTop: 8, textAlign: 'center', fontSize: 10,
                 color: B.muted, opacity: 0.6, fontFamily: SANS }}>
-                TC-16406 Accredited · Report issued 13 Apr 2026
+                FL 23/026 Accredited · Report issued 21 Jun 2023
               </Text>
             </View>
 
