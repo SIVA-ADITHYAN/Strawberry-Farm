@@ -95,19 +95,40 @@ const PdfCard = ({ pageNumber, pdfUri }: { pageNumber: number; pdfUri: string | 
     );
   }
 
-  // Android fallback: styled summary card
+  // Android/Web fallback: styled official summary card
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16 }}>
-      <Text style={{ fontSize: 32, marginBottom: 12 }}>🧪</Text>
-      <Text style={{ fontSize: 14, fontWeight: '700', color: B.dark, textAlign: 'center',
-        marginBottom: 8, fontFamily: SERIF }}>
-        Lab Report — Page {pageNumber}
+    <View style={{ flex: 1, backgroundColor: '#FBFAFF', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+      <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: 'white',
+        justifyContent: 'center', alignItems: 'center', marginBottom: 20,
+        shadowColor: B.primary, shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1, shadowRadius: 8, elevation: 2 }}>
+        <Text style={{ fontSize: 32 }}>📄</Text>
+      </View>
+      <Text style={{ fontSize: 13, color: B.primary, fontWeight: '700',
+        letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8, fontFamily: SANS }}>
+        Official Certificate
       </Text>
-      <Text style={{ fontSize: 12, color: B.muted, textAlign: 'center', lineHeight: 18,
-        fontFamily: SERIF }}>
-        FSRL2026-40 · Analysed 08–11 Apr 2026{'\n'}
-        TC-16406 Accredited · ICAR-IIHR Bangalore
+      <Text style={{ fontSize: 20, fontWeight: '700', color: B.dark, textAlign: 'center',
+        marginBottom: 12, fontFamily: SERIF, lineHeight: 28 }}>
+        Lab Analysis Summary{'\n'}Page {pageNumber}
       </Text>
+      <View style={{ width: 40, height: 2, backgroundColor: B.border, marginBottom: 16 }} />
+      <Text style={{ fontSize: 13, color: B.muted, textAlign: 'center', lineHeight: 22,
+        fontFamily: SERIF, maxWidth: 220 }}>
+        Report No: FSRL2026-62{'\n'}
+        Analysed 08–11 Apr 2026{'\n'}
+        ICAR-IIHR Accredited
+      </Text>
+
+      <TouchableOpacity
+        onPress={() => pdfUri && Linking.openURL(pdfUri)}
+        style={{ marginTop: 24, paddingVertical: 10, paddingHorizontal: 20,
+          backgroundColor: 'white', borderWidth: 1, borderColor: B.border, borderRadius: 12 }}
+      >
+        <Text style={{ fontSize: 11, color: B.primary, fontWeight: '700', fontFamily: SANS }}>
+          VIEW FULL PDF
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -222,7 +243,7 @@ export default function ProcessScreen({ navigation }: Props) {
                 marginBottom: 4, fontFamily: SERIF }}>Lab Report</Text>
               <Text style={{ fontSize: 11, color: '#555550', fontWeight: '600',
                 marginBottom: 2, fontFamily: SANS }}>
-                Report No: FSRL2026-40 · 13 Apr 2026
+                Report No: FSRL2026-62 · 13 Apr 2026
               </Text>
               <Text style={{ fontSize: 11, color: B.muted, marginBottom: 20, fontFamily: SANS }}>
                 Sample: Strawberry (1 kg) · Analysed 08–11 Apr 2026
