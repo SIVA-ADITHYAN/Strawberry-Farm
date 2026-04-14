@@ -4,6 +4,7 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  Linking,
   StyleSheet,
   Platform,
   NativeScrollEvent,
