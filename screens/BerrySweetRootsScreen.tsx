@@ -89,9 +89,9 @@ export default function BerrySweetRootsScreen({ navigation }: Props) {
     fontSize: Math.min(Math.max(width * 0.11, 41.6), 70.4),
     fontWeight: '800' as const,
     letterSpacing: -1.5,
-    lineHeight: Math.min(Math.max(width * 0.11, 41.6), 70.4) * 1.04,
+    lineHeight: Math.min(Math.max(width * 0.11, 41.6), 70.4) * 1.25,
     color: '#0a0a0a',
-    marginBottom: 22,
+    marginBottom: 24,
     fontFamily: FONT,
     textAlign: 'center' as const,
   };
@@ -100,9 +100,9 @@ export default function BerrySweetRootsScreen({ navigation }: Props) {
     fontSize: Math.min(Math.max(width * 0.055, 26.4), 36),
     fontWeight: '700' as const,
     letterSpacing: -0.5,
-    lineHeight: Math.min(Math.max(width * 0.055, 26.4), 36) * 1.1,
+    lineHeight: Math.min(Math.max(width * 0.055, 26.4), 36) * 1.4,
     color: '#0a0a0a',
-    marginBottom: 18,
+    marginBottom: 20,
     fontFamily: FONT,
     textAlign: 'center' as const,
   };
