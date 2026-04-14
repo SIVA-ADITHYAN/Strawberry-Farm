@@ -53,12 +53,7 @@ const promise = [
   { emoji: '🍃', stat: '24 hr',              label: 'Farm to Table', desc: 'Shortest possible supply chain — no cold-storage middlemen.' },
 ];
 
-/* ── Scroll hint ─────────────────────────────────────────────────── */
-const ScrollHint = () => (
-  <View style={sty.scrollHint} pointerEvents="none">
-    <Text style={{ fontSize: 22, color: 'rgba(91,62,166,0.30)', lineHeight: 22 }}>⌄</Text>
-  </View>
-);
+
 
 /* ── Back button ─────────────────────────────────────────────────── */
 const BackBtn = ({ onPress }: { onPress: () => void }) => (
@@ -175,38 +170,33 @@ export default function ProcessScreen({ navigation }: Props) {
                 <BackBtn onPress={goBackToStory} />
               </View>
 
-              <Text style={{ marginBottom: 4, fontSize: 11, color: B.amber,
+              <Text style={{ textAlign: 'center', marginBottom: 4, fontSize: 11, color: B.amber,
                 letterSpacing: 5.1, textTransform: 'uppercase', fontFamily: SANS, fontWeight: '600' }}>
                 Behind the scenes
               </Text>
-              <Text style={{ marginBottom: 24, fontSize: 20, fontWeight: '700',
-                color: B.dark, lineHeight: 26, fontFamily: SERIF }}>
-                From Farm{'\n'}to Table
+              <Text style={{ textAlign: 'center', marginBottom: 24, fontSize: 24, fontWeight: '700',
+                color: B.dark, lineHeight: 30, fontFamily: SERIF }}>
+                From Farm to Table
               </Text>
 
-              <View style={{ flex: 1, justifyContent: 'center', gap: 20 }}>
+              <View style={{ gap: 24, paddingBottom: 20 }}>
                 {steps.map(({ emoji, accent, label, desc }, i) => (
-                  <View key={label} style={{ flexDirection: 'row', gap: 14, alignItems: 'flex-start' }}>
-                    <View style={{ alignItems: 'center', flexShrink: 0 }}>
-                      <View style={{ width: 38, height: 38, borderRadius: 19,
-                        backgroundColor: accent, justifyContent: 'center', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 16 }}>{emoji}</Text>
-                      </View>
-                      {i < steps.length - 1 && (
-                        <View style={{ width: 1, height: 18, backgroundColor: B.border, marginTop: 4 }} />
-                      )}
+                  <View key={label} style={{ alignItems: 'center' }}>
+                    <View style={{ width: 48, height: 48, borderRadius: 24,
+                      backgroundColor: accent, justifyContent: 'center', alignItems: 'center', marginBottom: 8 }}>
+                      <Text style={{ fontSize: 20 }}>{emoji}</Text>
                     </View>
-                    <View style={{ paddingTop: 4 }}>
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: B.dark,
-                        marginBottom: 3, fontFamily: SERIF }}>{label}</Text>
-                      <Text style={{ fontSize: 12, color: B.muted, lineHeight: 18,
-                        fontFamily: SERIF }}>{desc}</Text>
+                    <View style={{ alignItems: 'center', paddingHorizontal: 12 }}>
+                      <Text style={{ fontSize: 17, fontWeight: '700', color: B.dark,
+                        marginBottom: 4, fontFamily: SERIF, textAlign: 'center' }}>{label}</Text>
+                      <Text style={{ fontSize: 14, color: B.muted, lineHeight: 20,
+                        fontFamily: SERIF, textAlign: 'center' }}>{desc}</Text>
                     </View>
                   </View>
                 ))}
               </View>
             </View>
-            <ScrollHint />
+
           </View>
 
           {/* ══ CARD 2 ─ Lab Report Summary ════════════════════════ */}
@@ -247,12 +237,12 @@ export default function ProcessScreen({ navigation }: Props) {
                       borderRadius: 18 }}>
                     <View style={{ flex: 1 }}>
                       <Text style={{ fontSize: 10, color: B.muted, letterSpacing: 1.9,
-                        textTransform: 'uppercase', marginBottom: 2, fontFamily: SANS }}>
+                        textTransform: 'uppercase', marginBottom: 4, fontFamily: SANS }}>
                         {label}
                       </Text>
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: B.dark,
-                        fontFamily: SERIF }}>{result}</Text>
-                      <Text style={{ fontSize: 10, color: B.muted, fontFamily: SANS }}>{note}</Text>
+                      <Text style={{ fontSize: 16, fontWeight: '700', color: B.dark,
+                        lineHeight: 22, marginBottom: 4, fontFamily: SERIF }}>{result}</Text>
+                      <Text style={{ fontSize: 13, color: B.muted, lineHeight: 20, fontFamily: SANS }}>{note}</Text>
                     </View>
                     <Text style={{ fontSize: 20, color: B.primary, marginLeft: 12 }}>✓</Text>
                   </View>
@@ -272,7 +262,7 @@ export default function ProcessScreen({ navigation }: Props) {
                 </View>
               </View>
             </View>
-            <ScrollHint />
+
           </View>
 
           {/* ══ CARD 3 ─ Lab PDF Page 1 ════════════════════════════ */}
@@ -311,7 +301,7 @@ export default function ProcessScreen({ navigation }: Props) {
                 TC-16406 Accredited · Analysed 08–11 Apr 2026
               </Text>
             </View>
-            <ScrollHint />
+
           </View>
 
           {/* ══ CARD 4 ─ Lab PDF Page 2 ════════════════════════════ */}
@@ -351,7 +341,7 @@ export default function ProcessScreen({ navigation }: Props) {
                 TC-16406 Accredited · Report issued 13 Apr 2026
               </Text>
             </View>
-            <ScrollHint />
+
           </View>
 
           {/* ══ CARD 5 ─ Our Commitment ════════════════════════════ */}
@@ -420,64 +410,14 @@ export default function ProcessScreen({ navigation }: Props) {
           </View>
         </ScrollView>
 
-        {/* ── Dot indicators ── */}
-        <DotNav
-          total={TOTAL_CARDS}
-          active={activeCard}
-          color={B.primary}
-          inactiveColor="rgba(91,62,166,0.25)"
-          onPress={goTo}
-          screenH={SCREEN_H}
-        />
       </View>
     </View>
   );
 }
 
-/* ── Dot Navigation ──────────────────────────────────────────────── */
-const DotNav = ({
-  total, active, color, inactiveColor, onPress, screenH,
-}: {
-  total: number; active: number; color: string; inactiveColor: string;
-  onPress: (i: number) => void; screenH: number;
-}) => {
-  const dotTotalH = total * 10 + (total - 1) * 10;
-  const topOffset = (screenH - dotTotalH) / 2;
-
-  return (
-    <View style={{ position: 'absolute', right: 12, top: topOffset, gap: 10, zIndex: 9999 }}>
-      {Array.from({ length: total }).map((_, i) => (
-        <TouchableOpacity
-          key={i}
-          onPress={() => onPress(i)}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          style={{
-            width: 10,
-            height: active === i ? 26 : 10,
-            borderRadius: 5,
-            backgroundColor: active === i ? color : inactiveColor,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.10,
-            shadowRadius: 2,
-            elevation: 1,
-          }}
-        />
-      ))}
-    </View>
-  );
-};
-
 const sty = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
     position: 'relative',
-  },
-  scrollHint: {
-    position: 'absolute',
-    bottom: 24,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
   },
 });

@@ -164,43 +164,31 @@ export default function HomeScreen({ navigation }: Props) {
             <ScrollHint text="Scroll Down" />
           </View>
 
-          {/* ══ CARD 2 ─ Our Strawberries ══════════════════════════ */}
+          {/* ══ CARD 2 ─ Strawberries ══════════════════════════════ */}
           <View style={[sty.card, { height: SCREEN_H }]}>
             <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: insets.top + 56, paddingBottom: 32, overflow: 'hidden' }}>
 
+              {/* Heading */}
+              <Text style={{ textAlign: 'center', marginBottom: 8, fontSize: 24,
+                fontWeight: '700', color: C.dark, fontFamily: SERIF, lineHeight: 32 }}>
+                Strawberries
+              </Text>
+
               {/* Eyebrow */}
-              <Text style={{ textAlign: 'center', marginBottom: 4, fontSize: 11,
+              <Text style={{ textAlign: 'center', marginBottom: 20, fontSize: 12,
                 color: C.amber, letterSpacing: 3.1, textTransform: 'uppercase',
                 fontWeight: '700', fontFamily: SANS }}>
                 Our Story
               </Text>
 
-              {/* Heading */}
-              <Text style={{ textAlign: 'center', marginBottom: 12, fontSize: 22,
-                fontWeight: '700', color: C.dark, fontFamily: SERIF }}>
-                Our Strawberries
-              </Text>
-
-              {/* Pull quote */}
-              <View style={{ marginBottom: 12, paddingVertical: 10, paddingRight: 12,
-                paddingLeft: 12, borderLeftWidth: 3, borderLeftColor: C.amber,
-                backgroundColor: 'rgba(193,140,93,0.05)', borderRadius: 10,
-                borderTopRightRadius: 10, borderBottomRightRadius: 10 }}>
-                <Text style={{ fontStyle: 'italic', fontWeight: '600', color: C.dark,
-                  lineHeight: 18, fontSize: 12, fontFamily: SERIF }}>
-                  In the quiet hills of Kodaikanal, The Berry Patch began with a simple
-                  idea — to grow strawberries the right way.
-                </Text>
-              </View>
-
               {/* Body */}
-              <Text style={{ fontSize: 12, color: C.muted, lineHeight: 20,
-                marginBottom: 8, fontFamily: SERIF }}>
+              <Text style={{ fontSize: 13, color: C.muted, lineHeight: 22,
+                marginBottom: 10, fontFamily: SERIF }}>
                 We work with local farmers — no shortcuts, no chemicals. Grown organically
                 in Kodaikanal's cool hills, just as nature intended.
               </Text>
-              <Text style={{ fontSize: 12, color: C.muted, lineHeight: 20,
-                marginBottom: 12, fontFamily: SERIF }}>
+              <Text style={{ fontSize: 13, color: C.muted, lineHeight: 22,
+                marginBottom: 16, fontFamily: SERIF }}>
                 We chose the{' '}
                 <Text style={{ color: C.dark, fontWeight: '700' }}>Camarosa variety</Text>
                 {' '}— handpicked at peak ripeness and lab-tested by{' '}
@@ -210,24 +198,6 @@ export default function HomeScreen({ navigation }: Props) {
 
               {/* Carousel */}
               <ImageCarousel containerWidth={innerW} />
-
-              {/* Pills */}
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap',
-                justifyContent: 'center', gap: 8, marginTop: 12 }}>
-                {[
-                  { label: '🌿 Organically Grown', color: C.green, bg: 'rgba(74,124,89,0.08)',  border: 'rgba(74,124,89,0.22)' },
-                  { label: '✓ Pesticide-Free',      color: C.red,   bg: C.bg,                    border: C.border               },
-                  { label: '🍓 Farm Fresh',          color: C.amber, bg: 'rgba(193,140,93,0.08)', border: 'rgba(193,140,93,0.22)' },
-                ].map(({ label, color, bg, border }) => (
-                  <View key={label} style={{ backgroundColor: bg, borderRadius: 99,
-                    paddingHorizontal: 11, paddingVertical: 4,
-                    borderWidth: 1, borderColor: border }}>
-                    <Text style={{ fontSize: 11, color, fontWeight: '700', fontFamily: SANS }}>
-                      {label}
-                    </Text>
-                  </View>
-                ))}
-              </View>
 
               {/* CTA: Our Process */}
               <TouchableOpacity
@@ -249,23 +219,23 @@ export default function HomeScreen({ navigation }: Props) {
             <ScrollHint />
           </View>
 
-          {/* ══ CARD 3 ─ Strawberry Jam ════════════════════════════ */}
+          {/* ══ CARD 3 ─ Strawberry Preserve ══════════════════════ */}
           <View style={[sty.card, { height: SCREEN_H, justifyContent: 'center',
-            alignItems: 'center', paddingHorizontal: 32 }]}>
+            alignItems: 'center', paddingHorizontal: 32, paddingVertical: 32 }]}>
             <View style={{ backgroundColor: 'rgba(193,140,93,0.10)', borderRadius: 99,
-              paddingHorizontal: 16, paddingVertical: 6,
+              paddingHorizontal: 18, paddingVertical: 8,
               borderWidth: 1, borderColor: 'rgba(193,140,93,0.3)', marginBottom: 20 }}>
-              <Text style={{ fontSize: 11, color: C.amber, letterSpacing: 3,
+              <Text style={{ fontSize: 14, color: C.amber, letterSpacing: 3,
                 textTransform: 'uppercase', fontWeight: '600', fontFamily: SANS }}>
                 Coming Soon
               </Text>
             </View>
-            <Text style={{ textAlign: 'center', fontSize: 36, fontWeight: '900',
-              color: C.dark, lineHeight: 40, marginBottom: 16, fontFamily: SERIF }}>
-              Strawberry{'\n'}Jam
+            <Text style={{ textAlign: 'center', fontSize: 58, fontWeight: '900',
+              color: C.dark, lineHeight: 68, marginBottom: 24, fontFamily: SERIF }}>
+              Strawberry{'\n'}Preserve
             </Text>
-            <Text style={{ textAlign: 'center', maxWidth: 240, fontSize: 13,
-              color: C.muted, lineHeight: 22, fontFamily: SERIF }}>
+            <Text style={{ textAlign: 'center', maxWidth: 300, fontSize: 20,
+              color: C.muted, lineHeight: 32, fontFamily: SERIF }}>
               Small-batch, handmade preserves from our organic harvest.
               No preservatives. Pure fruit.
             </Text>
@@ -277,12 +247,12 @@ export default function HomeScreen({ navigation }: Props) {
 
             {/* Top header */}
             <View style={{ paddingTop: insets.top + 64, paddingBottom: 20, alignItems: 'center' }}>
-              <Text style={{ textAlign: 'center', fontSize: 18, fontWeight: '700',
+              <Text style={{ textAlign: 'center', fontSize: 26, fontWeight: '700',
                 color: C.dark, letterSpacing: 3.2, textTransform: 'uppercase',
                 fontFamily: SERIF }}>
                 Get In Touch
               </Text>
-              <Text style={{ textAlign: 'center', marginTop: 4, fontSize: 12,
+              <Text style={{ textAlign: 'center', marginTop: 6, fontSize: 16,
                 color: C.muted, fontFamily: SERIF }}>
                 Order fresh strawberries or just say hello.
               </Text>
@@ -332,57 +302,10 @@ export default function HomeScreen({ navigation }: Props) {
           </View>
         </ScrollView>
 
-        {/* ── Dot indicators ── */}
-        <DotNav
-          total={TOTAL_CARDS}
-          active={activeCard}
-          color={C.red}
-          inactiveColor="rgba(217,58,76,0.25)"
-          onPress={goTo}
-          screenH={SCREEN_H}
-        />
       </View>
     </View>
   );
 }
-
-/* ── Dot Navigation ──────────────────────────────────────────────── */
-const DotNav = ({
-  total, active, color, inactiveColor, onPress, screenH,
-}: {
-  total: number; active: number; color: string; inactiveColor: string;
-  onPress: (i: number) => void; screenH: number;
-}) => {
-  // Each dot: 10px or 26px height + 10px gap. Total ≈ (total * 10) + ((total-1) * 10) + 16 extra
-  const dotTotalH = total * 10 + (total - 1) * 10;
-  const topOffset = (screenH - dotTotalH) / 2;
-
-  return (
-    <View style={{
-      position: 'absolute', right: 12, top: topOffset,
-      gap: 10, zIndex: 9999,
-    }}>
-      {Array.from({ length: total }).map((_, i) => (
-        <TouchableOpacity
-          key={i}
-          onPress={() => onPress(i)}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          style={{
-            width: 10,
-            height: active === i ? 26 : 10,
-            borderRadius: 5,
-            backgroundColor: active === i ? color : inactiveColor,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.12,
-            shadowRadius: 2,
-            elevation: 1,
-          }}
-        />
-      ))}
-    </View>
-  );
-};
 
 const sty = StyleSheet.create({
   card: {
